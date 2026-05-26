@@ -44,9 +44,9 @@ graph TD
 
     Mobile -->|Open Web Browser Interface| Flask
     
-    Flask -->|HTTP Get route: /video_feed| ViewStream["Live MJPEG Camera Feed"]
-    Flask -->|HTTP Get route: /unlock| ServoController -->|Signal Max (180° rotation)| Servo -->|Unlock Door Latch| DoorUnlocked["Door Unlocked"]
-    Flask -->|HTTP Get route: /lock| ServoController -->|Signal Min (0° rotation)| Servo -->|Lock Door Latch| DoorLocked["Door Locked"]
+    Flask -->|"HTTP Get route: /video_feed"| ViewStream["Live MJPEG Camera Feed"]
+    Flask -->|"HTTP Get route: /unlock"| ServoController -->|"Signal Max (180° rotation)"| Servo -->|"Unlock Door Latch"| DoorUnlocked["Door Unlocked"]
+    Flask -->|"HTTP Get route: /lock"| ServoController -->|"Signal Min (0° rotation)"| Servo -->|"Lock Door Latch"| DoorLocked["Door Locked"]
 ```
 
 ---
