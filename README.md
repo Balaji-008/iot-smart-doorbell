@@ -19,34 +19,48 @@
 
 ```mermaid
 graph TD
-    %% Smart Doorbell Physical Hardware Input
-    subgraph Hardware["Physical Doorbell Hardware"]
-        Button["Push Button (GPIO 17)<br>(Software Debounced)"]
+    %% Step 1: Input
+    subgraph InputStage["1. Input & Trigger"]
+        Button["Push Button (GPIO 17)<br>(Debounced)"]
         PiCam["PiCamera V2 Module<br>(CSI Ribbon Interface)"]
+    end
+
+    %% Step 2: Processing & Notification
+    subgraph ProcessStage["2. Processing & Alerting"]
+        RPiBtn["gpiozero Button Handler"]
+        Telegram["Telegram Bot API Cloud"]
+        Mobile["User's Mobile Device<br>(Alert with URL Link)"]
+    end
+
+    Button -->|Interrupt| RPiBtn
+    RPiBtn -->|Async API Call| Telegram
+    Telegram -->|Push Notification| Mobile
+
+    %% Step 3: Stream & Monitor
+    subgraph StreamStage["3. Live Monitoring Feed"]
+        Flask["Flask Web Server<br>(Port 5000)"]
+        Pipeline["MJPEG Video Pipeline<br>(OpenCV frame capture)"]
+        ViewStream["Live MJPEG Camera Feed"]
+    end
+
+    PiCam -->|Capture Frames| Pipeline
+    Pipeline -->|Yield MJPEG Boundary| Flask
+    Mobile -->|Open Web UI| Flask
+    Flask -->|"/video_feed"| ViewStream
+
+    %% Step 4: Control & Actuation
+    subgraph ControlStage["4. Access Control & Lock Latch"]
+        FlaskCmd{"User Latch Command"}
+        RPiServo["gpiozero Servo Actuator"]
         Servo["SG90 Servo Motor<br>(GPIO 18 - Lock Latch)"]
+        State["Physical Lock State"]
     end
 
-    %% RPi Processing Node
-    subgraph RPi["Raspberry Pi 4 Model B (Host Node)"]
-        Flask["Flask Web Application<br>(Running on Port 5000)"]
-        StreamPipeline["MJPEG Video Stream Pipeline<br>(OpenCV frame compression)"]
-        InterruptHandler["gpiozero Button Handler"]
-        ServoController["gpiozero Servo Actuator"]
-    end
-
-    %% Actions and Routing
-    Button -->|Triggers Interrupt| InterruptHandler
-    PiCam -->|Raw NumPy Frame capture| StreamPipeline
-    StreamPipeline -->|Yield MJPEG Boundary frames| Flask
-    
-    InterruptHandler -->|Trigger Background Async API Call| TelegramAPI["Telegram Bot API Cloud"]
-    TelegramAPI -->|Send Direct Secure Push Notification| Mobile["User's Mobile Device<br>(Receives Alert + URL link)"]
-
-    Mobile -->|Open Web Browser Interface| Flask
-    
-    Flask -->|"HTTP Get route: /video_feed"| ViewStream["Live MJPEG Camera Feed"]
-    Flask -->|"HTTP Get route: /unlock"| ServoController -->|"Signal Max (180° rotation)"| Servo -->|"Unlock Door Latch"| DoorUnlocked["Door Unlocked"]
-    Flask -->|"HTTP Get route: /lock"| ServoController -->|"Signal Min (0° rotation)"| Servo -->|"Lock Door Latch"| DoorLocked["Door Locked"]
+    Flask -->|"HTTP Get /lock or /unlock"| FlaskCmd
+    FlaskCmd -->|Lock| RPiServo
+    FlaskCmd -->|Unlock| RPiServo
+    RPiServo -->|"PWM Duty Signal"| Servo
+    Servo -->|"Rotate 0° / 180°"| State
 ```
 
 ---
