@@ -98,8 +98,8 @@ def generate_frames():
 When the doorbell button transitions to `pressed` (`button.when_pressed = doorbell_pressed`), the system sends an HTTP POST request to Telegram's cloud endpoint containing the local routing link:
 ```python
 def send_telegram_message(message):
-    bot_token = '7670195132:AAEsUMYr4w9...'
-    chat_id = '5963355561'
+    bot_token = 'xxxxx'  # Your Telegram Bot token
+    chat_id = 'xxxxx'    # Your Telegram Chat ID
     url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
     payload = {'chat_id': chat_id, 'text': message}
     requests.post(url, data=payload)

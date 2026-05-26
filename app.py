@@ -61,9 +61,9 @@ def doorbell_pressed():
     send_telegram_message("🚪 Ding Dong! Someone pressed the doorbell. URL http://192.168.48.169:5000")
 
 def send_telegram_message(message):
-    bot_token = '7670195132:AAEsUMYr4w9OAP36HrjMCMpMITTrZ_lZ-qk'
-    chat_id = '5963355561'
-    url = f"https://api.telegram.org/bot7670195132:AAEsUMYr4w9OAP36HrjMCMpMITTrZ_lZ-qk/sendMessage"
+    bot_token = 'xxxxx'  # Redacted — replace with your Telegram Bot token
+    chat_id = 'xxxxx'    # Redacted — replace with your Telegram Chat ID
+    url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
     payload = {
         'chat_id': chat_id,
         'text': message
